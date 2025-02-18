@@ -1,0 +1,5 @@
+# Handle line endings automatically
+* text=auto
+
+# Ignore node_modules line-ending warnings
+node_modules/* -text

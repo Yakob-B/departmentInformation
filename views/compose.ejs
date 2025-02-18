@@ -1,0 +1,20 @@
+<%-include("Partials/header.ejs");%>
+<h1>Compose</h1>
+
+<form action="/" method="post">
+<div class="mb-3 form-group">
+    
+    <label for="exampleFormControlInput1" class="form-label">Department-Name</label>
+    <textarea class="form-control" id="exampleFormControlTextarea1" rows="1" name="postTitle"></textarea>
+  </div>
+  <div class="mb-3 form-group" >
+    <label for="exampleFormControlTextarea1" class="form-label">All-about the department</label>
+    <textarea class="form-control" id="exampleFormControlTextarea1" rows="4" name="postBody"></textarea>
+
+  </div>
+  <div class="btn-group form-group" role="group" aria-label="Basic example">
+    <button type="submit" class="btn btn-primary">publish</button>
+</div>
+</form>
+
+<%-include("Partials/footer.ejs");%>
