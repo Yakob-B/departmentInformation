@@ -5,7 +5,15 @@ const bodyParser = require("body-parser");
 const ejs = require("ejs");
 var _ = require("lodash");
 const mongoose = require("mongoose");
-mongoose.connect('mongodb://127.0.0.1:27017/departInfoDB');
+
+require("dotenv").config();
+
+mongoose
+  .connect(process.env.MONGO_URI, {
+    
+  })
+  .then(() => console.log("MongoDB Atlas Connected"))
+  .catch((err) => console.error("MongoDB Connection Error:", err));
 
 const departSchema = new mongoose.Schema({
   title:String,
@@ -30,22 +38,47 @@ app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static("public"));
 // to add new department 
-app.post("/",function(req,res){
-  const postTitle = req.body.postTitle;
-  const postBody = req.body.postBody
-
-  const newPost = new Post({ 
-
-    title: postTitle,  
-    body: postBody 
-  });  
+// app.post("/",function(req,res){
+//   const postTitle = req.body.postTitle;
+//   const postBody = req.body.postBody
   
+
+//   const newPost = new Post({ 
+
+//     title: postTitle,  
+//     body: postBody 
+//   });  
+  
+//   // Save the department post to the database  
+//   newPost.save()  
+
+//  res.redirect("/");
+
+// })
+
+app.post("/", function(req, res) {
+  const postTitle = req.body.postTitle;
+  const postBody = req.body.postBody;
+
+  // Convert line breaks in the body to <br> tags
+  const formattedBody = postBody ? postBody.replace(/\n/g, "<br>") : "";
+
+  const newPost = new Post({
+    title: postTitle,
+    body: formattedBody  // Save the formatted body with <br> tags
+  });
+
   // Save the department post to the database  
-  newPost.save()  
+  newPost.save()
+    .then(() => {
+      res.redirect("/");  // Redirect to home page after saving
+    })
+    .catch(err => {
+      console.error(err);
+      res.status(500).send("An error occurred while saving the post.");
+    });
+});
 
- res.redirect("/");
-
-})
 
 
 
@@ -98,18 +131,44 @@ app.get("/posts/:postName", async function (req, res) {
 
 
 
-app.get("/",function(req,res){
-  Post.find({})
-  .then(posts => {
-    res.render("home", { HomeParagraph: homeStartingContent, posts: posts });
-  })
-  .catch(err => {
-    console.error(err);
-    res.status(500).send("An error occurred while fetching posts.");
-  });
+// app.get("/",function(req,res){
+//   Post.find({})
+//   .then(posts => {
+//     const formattedText = req.body.postBody.replace(/\n/g, "<br>");
+//   document.getElementById("content").innerHTML = formattedText;
+//     res.render("home", { HomeParagraph: homeStartingContent, posts: posts });
+//   })
+//   .catch(err => {
+//     console.error(err);
+//     res.status(500).send("An error occurred while fetching posts.");
+//   });
 
   
+// });
+
+app.get("/", function(req, res) {
+  Post.find({})
+    .then(posts => {
+      // Format the text for each post
+      posts = posts.map(post => {
+        // If post.body is undefined or null, use an empty string
+        const formattedBody = post.body ? post.body.replace(/\n/g, "<br>") : "";
+        return {
+          ...post.toObject(),  // Preserve other post fields
+          formattedBody: formattedBody // Add the formatted body
+        };
+      });
+
+      res.render("home", {HomeParagraph: homeStartingContent, posts: posts });
+    })
+    .catch(err => {
+      console.error(err);
+      res.status(500).send("An error occurred while fetching posts.");
+    });
 });
+
+
+
 
 app.get("/about",function(req,res){
  res.render("about",{aboutParagraph:aboutContent});

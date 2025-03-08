@@ -2,17 +2,22 @@
 <%-include("Partials/header.ejs");%>
 <h1>Explore Your Future with Confidence</h1>
 <p>
-    <%=HomeParagraph%> 
+    <%-HomeParagraph%> 
     
 </p>
 <hr>
 <% posts.forEach(function(post) { %>
-
-    <h1><%=post.title %></h1>
+    <h1><%- post.title %></h1>
     
-     <p class="Postedp"><%=post.body.substring(0,100) + " ..."%> <a href="/posts/<%=post.title%>">Read More</a></p>
-     <hr>
+    <!-- Display the shortened formatted body, ensure it's not undefined -->
+    <p class="Postedp">
+      <%- post.formattedBody ? post.formattedBody.substring(0, 100) + " ..." : "No content available" %> 
+      <a href="/posts/<%= post.title %>">Read More</a>
+    </p>
+    <hr>
   <% }) %>
+  
+  
   
 <%-include("Partials/footer.ejs");%>
 
