@@ -1,12 +1,12 @@
 
-
+require("dotenv").config();
 const express = require("express");
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
 var _ = require("lodash");
 const mongoose = require("mongoose");
 
-require("dotenv").config();
+
 
 mongoose
   .connect(process.env.MONGO_URI, {
@@ -21,8 +21,14 @@ const departSchema = new mongoose.Schema({
 
 });
 
+const UserSchema = new mongoose.Schema({
+  email:String,
+  password:String
+})
+
 
 const Post = mongoose.model('Post',departSchema);
+const User = mongoose.model("User",UserSchema)
 
 
 const homeStartingContent = " Welcome to the ultimate hub for discovering and understanding various departments and career paths. Whether you’re a student choosing a major, a job seeker exploring new opportunities, or someone passionate about learning, you’re in the right place.Our platform offers comprehensive information about different departments—from their roles and responsibilities to potential career opportunities. We break down what each field entails, helping you understand its impact, challenges, and growth prospects.Choosing the right path can be overwhelming, but with the right knowledge, it becomes an exciting journey. Our mission is to guide you through this process by providing clear, reliable insights to help you make informed decisions.Explore detailed profiles of each department, learn about their contributions to various industries, and discover the skills you’ll need to thrive in your chosen field. Whether you’re planning your future or considering a career switch, we’re here to support your journey every step of the way.Start exploring today—because the right choice can shape your tomorrow!.";
@@ -55,6 +61,57 @@ app.use(express.static("public"));
 //  res.redirect("/");
 
 // })
+app.get("/",function(req,res){
+  res.render("Index");
+});
+app.get("/login",function(req,res){
+  res.render("login");
+});
+
+app.get("/register",function(req,res){
+  res.render("register");
+});
+ // Handling register route
+
+app.post("/register", async function (req, res) {
+   try {
+      const newUser = new User({
+         email: req.body.username,
+         password: req.body.password
+      });
+
+      await newUser.save(); // Using async/await instead of callback
+      res.render("home",{ HomeParagraph: homeStartingContent, posts: posts});
+   } catch (err) {
+      console.error(err);
+      res.status(500).send("Error registering user");
+   }
+});
+  //  handling login route
+
+
+app.post("/login", async function (req, res) {
+  try {
+    const email = req.body.username; // Ensure this is named properly
+    const password = req.body.password;
+
+    const foundUser = await User.findOne({ email: email });
+
+    if (foundUser) {
+      if (foundUser.password === password) {
+        res.render("home",{HomeParagraph: homeStartingContent, posts: posts});
+      } else {
+        res.status(401).send("Incorrect password");
+      }
+    } else {
+      res.status(404).send("User not found");
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Server error");
+  }
+});
+  
 
 app.post("/", function(req, res) {
   const postTitle = req.body.postTitle;
