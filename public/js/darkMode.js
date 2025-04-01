@@ -1,17 +1,3 @@
-
-</div>
-<div class="footer-padding"></div>
-  <div class="footer">
-    <p>Made with ❤️ by Yakob</p>
-  </div>
-</div>
-<script>
-//   function myFunction() {
-//    var element = document.body;
-//    element.classList.toggle("dark-mode");
-//    element.classList.toggle("dark-mode h2");
-// }
-
 document.addEventListener("DOMContentLoaded", function () {
     const isDarkMode = localStorage.getItem("darkMode") === "enabled";
     if (isDarkMode) {
@@ -23,11 +9,3 @@ function myFunction() {
     document.body.classList.toggle("dark-mode");
     localStorage.setItem("darkMode", document.body.classList.contains("dark-mode") ? "enabled" : "disabled");
 }
-
-
-function myFunction2(x) {
-  x.classList.toggle("fa-moon-o");
-}
-</script>
-</body>
-</html>
